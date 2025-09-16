@@ -25,6 +25,8 @@ java -jar builds/lib/*.jar
 
 ## frontend
 
+frontend is just a single HTML file vibe coded with Claude including JS and CSS
+
 open `http://localhost:8080` in the browser
 
 ![screen](screen.png)
