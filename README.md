@@ -1,6 +1,6 @@
 ## car recommendation app
 
-This is sample car recommendation backend built with Spring AI and Open AI.
+This is sample car recommendation app built with Spring AI and Open AI.
 
 ## configuration
 
