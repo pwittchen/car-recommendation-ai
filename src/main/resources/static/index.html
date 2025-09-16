@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarAI - Car Recommendation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.15) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .container {
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 950px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: rgba(0, 245, 255, 0.5);
+            background: rgba(0, 245, 255, 0.05);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Toggle Switch for New/Used */
+        .condition-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 0.3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-option {
+            padding: 0.8rem 1.5rem;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-option.active {
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            color: #000;
+            transform: scale(1.02);
+        }
+
+        .toggle-option:not(.active) {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-option:not(.active):hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Clean Budget Slider */
+        .budget-slider-container {
+            padding: 1.5rem 0;
+        }
+
+        .budget-display {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .budget-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .budget-currency {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-left: 0.5rem;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .budget-slider {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .budget-slider::-webkit-slider-track {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .budget-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .budget-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .budget-slider::-moz-range-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-track-fill {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, #00f5ff, #ff00ff);
+            border-radius: 2px;
+            transition: width 0.2s ease;
+            pointer-events: none;
+            left: 0;
+            width: 0%;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.8rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendation-content {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 3px solid #00f5ff;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            font-size: 1rem;
+            white-space: pre-line;
+        }
+
+        .error-container {
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+            border-left: 3px solid #ff3232;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .error-title {
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid #00f5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .budget-value {
+                font-size: 1.6rem;
+            }
+
+            body {
+                padding: 1rem;
+            }
+
+            .condition-toggle {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .toggle-wrapper {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Clean scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 245, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚗 Auto Match</div>
+            <div class="tagline">Car recommendation supported by the AI</div>
+        </div>
+
+        <form id="carForm">
+            <!-- New/Used Car Toggle -->
+            <div class="form-group">
+                <label class="form-label">Car Condition</label>
+                <div class="condition-toggle">
+                    <div class="toggle-wrapper">
+                        <div class="toggle-option active" data-condition="true">New Car</div>
+                        <div class="toggle-option" data-condition="false">Used Car</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="budget">Budget Range</label>
+                <div class="budget-slider-container">
+                    <div class="budget-display">
+                        <span class="budget-value" id="budgetDisplay">0</span>
+                        <span class="budget-currency">PLN</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <div class="slider-track-fill" id="sliderFill"></div>
+                        <input type="range" id="budget" class="budget-slider" min="0" max="500000" value="0" step="1000">
+                    </div>
+                    <div class="slider-labels">
+                        <span>0</span>
+                        <span>100K</span>
+                        <span>200K</span>
+                        <span>300K</span>
+                        <span>500K</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="carType">Vehicle Type</label>
+                    <select id="carType" class="form-select">
+                        <option value="">Any vehicle type</option>
+                        <option value="sedan">Sedan</option>
+                        <option value="hatchback">Hatchback</option>
+                        <option value="suv">SUV</option>
+                        <option value="coupe">Coupe</option>
+                        <option value="wagon">Wagon</option>
+                        <option value="convertible">Convertible</option>
+                        <option value="pickup">Pickup Truck</option>
+                        <option value="minivan">Minivan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="fuelType">Power Source</label>
+                    <select id="fuelType" class="form-select">
+                        <option value="">Any power source</option>
+                        <option value="petrol">Petrol</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="electric">Electric</option>
+                        <option value="lpg">LPG</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="brand">Preferred Brand</label>
+                <select id="brand" class="form-select">
+                    <option value="">Any brand</option>
+                    <option value="tesla">Tesla</option>
+                    <option value="bmw">BMW</option>
+                    <option value="mercedes">Mercedes-Benz</option>
+                    <option value="audi">Audi</option>
+                    <option value="toyota">Toyota</option>
+                    <option value="volkswagen">Volkswagen</option>
+                    <option value="ford">Ford</option>
+                    <option value="opel">Opel</option>
+                    <option value="skoda">Škoda</option>
+                    <option value="honda">Honda</option>
+                    <option value="nissan">Nissan</option>
+                    <option value="hyundai">Hyundai</option>
+                    <option value="kia">Kia</option>
+                    <option value="mazda">Mazda</option>
+                    <option value="peugeot">Peugeot</option>
+                    <option value="renault">Renault</option>
+                    <option value="fiat">Fiat</option>
+                    <option value="volvo">Volvo</option>
+                    <option value="porsche">Porsche</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="comments">Additional Requirements</label>
+                <textarea id="comments" class="form-textarea" placeholder="Describe your driving style, lifestyle needs, performance expectations, or any specific requirements..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Get Recommendations
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing your preferences...</p>
+        </div>
+
+        <div class="result-container" id="results">
+            <div class="result-header">
+                <div class="ai-icon">🤖</div>
+                <div class="result-title">AI Recommendation</div>
+            </div>
+            <div class="recommendation-content" id="recommendationContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCondition = true; // true = new, false = used
+        const API_BASE_URL = 'http://localhost:8080';
+
+        // Initialize components
+        document.addEventListener('DOMContentLoaded', function() {
+            const budgetSlider = document.getElementById('budget');
+            const budgetDisplay = document.getElementById('budgetDisplay');
+            const sliderFill = document.getElementById('sliderFill');
+
+            function updateBudgetDisplay() {
+                const value = parseInt(budgetSlider.value);
+                budgetDisplay.textContent = value === 0 ? '0' : value.toLocaleString();
+                
+                // Update slider fill
+                const percentage = (value / 500000) * 100;
+                sliderFill.style.width = percentage + '%';
+            }
+
+            budgetSlider.addEventListener('input', updateBudgetDisplay);
+            
+            // Force initial state
+            budgetSlider.value = 0;
+            updateBudgetDisplay();
+
+            // Handle new/used toggle
+            const toggleOptions = document.querySelectorAll('.toggle-option');
+            toggleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    toggleOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Update selected condition (convert string to boolean)
+                    selectedCondition = this.dataset.condition === 'true';
+                });
+            });
+        });
+
+        document.getElementById('carForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const budget = parseInt(document.getElementById('budget').value);
+            const carType = document.getElementById('carType').value;
+            const fuelType = document.getElementById('fuelType').value;
+            const brand = document.getElementById('brand').value;
+            const comments = document.getElementById('comments').value;
+
+            // Show loading state
+            showLoading();
+
+            try {
+                const recommendation = await fetchRecommendation({
+                    isNew: selectedCondition,
+                    budget: budget || null,
+                    type: carType || null,
+                    fuel: fuelType || null,
+                    brand: brand || null,
+                    comment: comments || null
+                });
+
+                displayRecommendation(recommendation);
+            } catch (error) {
+                displayError(error);
+            }
+        });
+
+        async function fetchRecommendation(params) {
+            // Build query string
+            const queryParams = new URLSearchParams();
+            
+            // Add parameters only if they have values
+            if (params.isNew !== null) queryParams.append('isNew', params.isNew);
+            if (params.budget !== null) queryParams.append('budget', params.budget);
+            if (params.type !== null) queryParams.append('type', params.type);
+            if (params.fuel !== null) queryParams.append('fuel', params.fuel);
+            if (params.brand !== null) queryParams.append('brand', params.brand);
+            if (params.comment !== null) queryParams.append('comment', params.comment);
+
+            const url = `${API_BASE_URL}/car/recommend?${queryParams.toString()}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data || !data.recommendation) {
+                    throw new Error('Invalid response format from server');
+                }
+
+                return data.recommendation;
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    throw new Error('Unable to connect to the recommendation service. Please ensure the server is running on localhost:8080');
+                }
+                throw error;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function displayRecommendation(recommendation) {
+            hideLoading();
+            
+            const recommendationContent = document.getElementById('recommendationContent');
+            recommendationContent.textContent = recommendation;
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayError(error) {
+            hideLoading();
+            
+            const resultsContainer = document.getElementById('results');
+            const recommendationContent = document.getElementById('recommendationContent');
+            
+            // Create error display
+            recommendationContent.innerHTML = `
+                <div class="error-container">
+                    <div class="error-title">Connection Error</div>
+                    <div>${error.message}</div>
+                    <br>
+                    <div style="font-size: 0.9em; color: rgba(255, 255, 255, 0.6);">
+                        Please check that:
+                        <br>• The recommendation service is running on localhost:8080
+                        <br>• Your network connection is working
+                        <br>• CORS is properly configured on the server
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.style.display = 'block';
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
