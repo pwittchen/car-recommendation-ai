@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.github.pwittchen'
 version = '0.0.1-SNAPSHOT'
-description = 'backend'
+description = 'car-recommendation-ai'
 
 java {
     toolchain {
