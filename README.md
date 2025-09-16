@@ -1,4 +1,4 @@
-## car recommendation app
+## car recommendation AI
 
 This is sample car recommendation app built with Spring AI and Open AI.
 
